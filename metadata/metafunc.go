@@ -2,11 +2,45 @@ package metadata
 
 import (
 	"fmt"
+	"math"
+	"sort"
 	"sync"
 	"time"
 
 	"github.com/stock-jarvis/OutGen/db"
 )
+
+func GetTradeDays(metadata []db.Metadata) []int32 {
+	var days []int32
+	for _, m := range metadata {
+		days = append(days, m.Date)
+	}
+	sort.Slice(days, func(i, j int) bool {
+		if days[i] < days[j] {
+			return true
+		} else {
+			return false
+		}
+	})
+	return days
+}
+
+func GetDailyProfits(metadata []db.Metadata) []float64 {
+	var profits []float64
+	for _, m := range metadata {
+		profits = append(profits, float64(m.Result))
+	}
+	return profits
+}
+
+func GetDayWiseProfit(metadata []db.Metadata) map[time.Weekday]float64 {
+	out := make(map[time.Weekday]float64)
+	for _, m := range metadata {
+		d := time.Unix(int64(m.Date), 0).Weekday()
+		out[d] += float64(m.Result)
+	}
+	return out
+}
 
 // TotalProfit calculates TotalPnL for all days, daily average and monthly average
 // Out: pnl,daily average pnl,monthly average pnl,yearly average pnl
@@ -180,6 +214,34 @@ func MDD(metadata []db.Metadata, ayp float64) (float64, int32, float64) {
 	return mdd, mrp / (60 * 60 * 24), ayp / mdd
 }
 
-func Expectancy() {
-
+func Expectancy(posData []db.PositionData) float64 {
+	profitSum := 0.0
+	profitCount := 0
+	lossSum := 0.0
+	lossCount := 0
+	for _, pos := range posData {
+		if pos.Result >= 0 {
+			profitCount += 1
+			profitSum += float64(pos.Result)
+		} else {
+			lossCount += 1
+			lossSum += float64(pos.Result)
+		}
+	}
+	lossSum = math.Abs(lossSum)
+	avgProf := profitSum / float64(profitCount)
+	avgLoss := lossSum / float64(lossCount)
+	// pfrac := profitCount / (profitCount + lossCount)
+	// lfrac := lossCount / (profitCount + lossCount)
+	// fmt.Println(avgProf)
+	// fmt.Println(avgLoss)
+	// fmt.Println(profitCount)
+	// fmt.Println(lossCount)
+	// fmt.Println(profitCount + lossCount)
+	e1 := avgProf / avgLoss
+	e2 := float64(profitCount) / float64(profitCount+lossCount)
+	e3 := e1 * e2
+	e4 := float64(lossCount) / float64(profitCount+lossCount)
+	e5 := e3 - e4
+	return e5
 }
