@@ -11,7 +11,7 @@ import (
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"github.com/stock-jarvis/OutGen/cmd"
-	"github.com/stock-jarvis/OutGen/db"
+	"github.com/stock-jarvis/OutGen/pkg/db"
 )
 
 func init() {
@@ -85,7 +85,6 @@ func main() {
 			time.Sleep(time.Hour * 3)
 		}
 	}()
-
 	log.Println("Starting up http server and registering routes: ")
 	r := gin.Default()
 	webhooks := r.Group("/webhooks")
@@ -94,6 +93,7 @@ func main() {
 	webhooks.GET("/initUser", cmd.InitUDB)
 	webhooks.GET("/cnb", cmd.CreateNewBasket)
 	webhooks.GET("/loadop", cmd.LoadOP)
+	webhooks.GET("/simreport", cmd.GetSimReport)
 	r.Run(os.Getenv("WEBHOOK_PORT"))
 
 }

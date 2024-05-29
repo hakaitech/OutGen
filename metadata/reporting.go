@@ -7,7 +7,7 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/stock-jarvis/OutGen/db"
+	"github.com/stock-jarvis/OutGen/pkg/db"
 )
 
 type Report struct {

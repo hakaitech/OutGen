@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/stock-jarvis/OutGen/db"
+	"github.com/stock-jarvis/OutGen/pkg/db"
 )
 
 func GetTradeDays(metadata []db.Metadata) []int32 {

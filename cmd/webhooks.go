@@ -5,8 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"github.com/stock-jarvis/OutGen/db"
 	"github.com/stock-jarvis/OutGen/metadata"
+	"github.com/stock-jarvis/OutGen/pkg/db"
+	"github.com/stock-jarvis/OutGen/sim"
 )
 
 func Report(ctx *gin.Context) {
@@ -141,4 +142,24 @@ func LoadOP(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusAccepted, gin.H{"message": "loaded"})
 
+}
+
+func GetSimReport(ctx *gin.Context) {
+	name, ok := ctx.GetQuery("name")
+	if !ok {
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	uid, ok := ctx.GetQuery("uid")
+	if !ok {
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	report, positionData := sim.SimReportRunner(name, uid)
+	ctx.JSON(http.StatusOK, gin.H{
+		"Report":         report,
+		"splitPositions": positionData,
+	})
 }
