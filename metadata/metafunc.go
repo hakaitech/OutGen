@@ -1,7 +1,6 @@
 package metadata
 
 import (
-	"fmt"
 	"math"
 	"sort"
 	"sync"
@@ -37,7 +36,7 @@ func GetDayWiseProfit(metadata []db.Metadata) map[time.Weekday]float64 {
 	out := make(map[time.Weekday]float64)
 	for _, m := range metadata {
 		d := time.Unix(int64(m.Date), 0).Weekday()
-		out[d] += float64(m.Result)
+		out[d] = out[d] + float64(m.Result)
 	}
 	return out
 }
@@ -165,7 +164,7 @@ func MDD(metadata []db.Metadata, ayp float64) (float64, int32, float64) {
 	mddpos := [][2]int{}
 	for i := 0; i < len(metadata); {
 		if metadata[i].Result < 0 {
-			fmt.Println(metadata[i].Result)
+			// fmt.Println(metadata[i].Result)
 			pos := [2]int{i, 0}
 			tempsum := metadata[i].Result
 			for j := i + 1; j < len(metadata); j++ {
